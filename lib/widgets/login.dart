@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import '../paginas/HomePage.dart' as homePage;
 
 import 'package:flutter/material.dart';
 
@@ -68,7 +69,15 @@ class _loginState extends State<login> {
             Container(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  //al presionar loguear te lleva a esta parte
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => homePage.HomePage(),
+                    ),
+                  );
+                },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(Colors.cyan), // Color de fondo
                   foregroundColor: MaterialStateProperty.all<Color>(Colors.white), // Color del texto
@@ -78,7 +87,7 @@ class _loginState extends State<login> {
                     ),
                   ),
                 ),
-                child: Text('Enviar'),
+                child: Text('Iniciar sesion'),
               ),
             ),
 
