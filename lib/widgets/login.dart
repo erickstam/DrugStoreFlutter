@@ -78,7 +78,7 @@ class _loginState extends State<login> {
                     ),
                   ),
                 ),
-                child: Text('Enviar Datos'),
+                child: Text('Enviar'),
               ),
             ),
 
