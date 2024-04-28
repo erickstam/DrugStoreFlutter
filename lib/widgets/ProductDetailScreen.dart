@@ -147,6 +147,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
+            _buildDistanceInfo('A pie', Icons.directions_walk, pharmacy),
+            _buildDistanceInfo('En coche', Icons.directions_car, pharmacy),
+            _buildDistanceInfo('En coche con tráfico', Icons.traffic, pharmacy),
+            SizedBox(height: 8),
+            Text(
+              'Stock disponible: ${pharmacy['stock'] ?? 0}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -158,7 +167,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       color: Colors.red,
                     ),
                   )
-                else
+                else if (pharmacy['pharmacyOutput']['pharmacySchedules'] != null &&
+                    (pharmacy['pharmacyOutput']['pharmacySchedules'] as List).isNotEmpty)
                   ElevatedButton(
                     onPressed: () {
                       _showModal(pharmacy['pharmacyOutput']['pharmacySchedules']);
@@ -175,14 +185,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   child: Text('Ver en mapa'),
                 ),
               ],
-            ),
-            SizedBox(height: 8),
-            _buildDistanceInfo('A pie', Icons.directions_walk, pharmacy),
-            _buildDistanceInfo('En coche', Icons.directions_car, pharmacy),
-            _buildDistanceInfo('En coche con tráfico', Icons.traffic, pharmacy),
-            SizedBox(height: 8),
-            Text(
-              'Stock disponible: ${pharmacy['stock'] ?? 0}',
             ),
           ],
         ),
