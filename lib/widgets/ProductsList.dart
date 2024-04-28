@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../Manager/ApiManager.dart';
+import 'package:geolocator/geolocator.dart';
+
+import 'ProductDetailScreen.dart';
+
 class ProductsList extends StatefulWidget {
   final String apiUrl;
 
@@ -158,93 +162,6 @@ class _ProductsListState extends State<ProductsList> {
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class ProductDetailScreen extends StatelessWidget {
-  final dynamic item;
-
-  ProductDetailScreen({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    // Obtener la descripción del artículo
-    final Map<String, dynamic> description = item['description'];
-
-    // Obtener la categoría de salidas
-    final List<dynamic> categoryOutputs = item['categoryOutputs'];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Detalles del Producto'),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          color: Colors.grey[200], // Color de fondo gris
-          padding: EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Nombre del artículo
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  '${description['name']}',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              // Descripción del artículo
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text('Descripción: ${description['description']}'),
-              ),
-              // URL de la imagen del artículo (solo se muestra si hay una URL)
-              if (item['urlImage'] != null)
-                Container(
-                  height: 300, // Altura más grande para la imagen
-                  width: double.infinity,
-                  margin: EdgeInsets.only(bottom: 8.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0), // Bordes ovalados
-                    color: Colors.grey[700], // Color de fondo gris oscuro
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0), // Bordes ovalados
-                    child: Image.network(
-                      item['urlImage'],
-                      fit: BoxFit.cover, // Ajustar la imagen sin deformarla
-                    ),
-                  ),
-                ),
-              // Categorías de salidas
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  'Categorías:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              // Lista de categorías de salidas
-              Wrap(
-                spacing: 8.0, // Espaciado entre las categorías
-                children: categoryOutputs.map<Widget>((category) {
-                  final categoryDescription = category['description'];
-                  return Container(
-                    padding: EdgeInsets.all(6),
-                    margin: EdgeInsets.only(bottom: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300], // Color de fondo gris claro
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(categoryDescription['name']),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
