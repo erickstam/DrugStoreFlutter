@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../Manager/ApiManager.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -177,7 +178,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 TextButton(
                   onPressed: () {
-                    _navigateToPharmacyLocation(
+                    _showMapModal(
                       pharmacy['pharmacyOutput']['location']['latitude'],
                       pharmacy['pharmacyOutput']['location']['longitude'],
                     );
@@ -235,6 +236,47 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
+
+  void _showMapModal(double latitude, double longitude) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  child: GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(latitude, longitude),
+                      zoom: 14,
+                    ),
+                    markers: {
+                      Marker(
+                        markerId: MarkerId('pharmacy'),
+                        position: LatLng(latitude, longitude),
+                      ),
+                    },
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cerrar'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _showModal(List<dynamic>? pharmacySchedules) {
     showModalBottomSheet(
       context: context,
