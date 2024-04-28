@@ -235,21 +235,46 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
-
-  void _showModal(List<dynamic> pharmacySchedules) {
+  void _showModal(List<dynamic>? pharmacySchedules) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Container(
           padding: EdgeInsets.all(16),
           child: ListView.builder(
-            itemCount: pharmacySchedules.length,
+            itemCount: pharmacySchedules?.length ?? 0,
             itemBuilder: (context, index) {
+              final schedule = pharmacySchedules![index];
               return Card(
+                color: Colors.grey[200], // Color gris claro para el card
+                elevation: 3,
+                margin: EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(color: Colors.grey[700]!), // Borde gris oscuro
+                ),
                 child: ListTile(
-                  title: Text(pharmacySchedules[index]['dayOfWeek']),
-                  subtitle: Text(
-                    '${pharmacySchedules[index]['openingTime']} - ${pharmacySchedules[index]['closingTime']}',
+                  title: Text(
+                    schedule['day'],
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Horario: ${schedule['openingTime'] ?? ''} - ${schedule['closingTime'] ?? ''}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Abre: ${schedule['openingTime'] ?? ''}',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                      Text(
+                        'Cierra: ${schedule['closingTime'] ?? ''}',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -259,6 +284,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       },
     );
   }
+
+
 }
 
 class PharmacyLocationScreen extends StatelessWidget {
