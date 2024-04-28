@@ -59,42 +59,60 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       appBar: AppBar(
         title: Text('Detalles del Producto'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Nombre: ${widget.item['description']['name']}',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Descripción: ${widget.item['description']['description']}',
-                  ),
-                ],
+      body: SingleChildScrollView(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Nombre: ${widget.item['description']['name']}',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-            ),
+              SizedBox(height: 8),
+              if (widget.item['urlImage'] != null)
+                Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey[700]!),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      widget.item['urlImage'],
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              SizedBox(height: 8),
+              Text(
+                'Descripción: ${widget.item['description']['description']}',
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Farmacias Cercanas:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              SizedBox(height: 8),
+              FutureBuilder(
+                future: futureNearbyPharmacies,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    return _buildNearbyPharmacies(snapshot.data);
+                  }
+                },
+              ),
+            ],
           ),
-          Expanded(
-            flex: 3,
-            child: FutureBuilder(
-              future: futureNearbyPharmacies,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
-                  return _buildNearbyPharmacies(snapshot.data);
-                }
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -102,66 +120,103 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget _buildNearbyPharmacies(dynamic data) {
     final List<dynamic> nearbyPharmacies = data;
 
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.all(10),
+    return Column(
+      children: [
+        for (var pharmacy in nearbyPharmacies)
+          _buildPharmacyCard(pharmacy),
+      ],
+    );
+  }
+
+  Widget _buildPharmacyCard(dynamic pharmacy) {
+    bool isOpenAllHours = pharmacy['isOpenAllHours'] ?? false;
+
+    return Card(
+      elevation: 3,
+      margin: EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Farmacias Cercanas:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              pharmacy['pharmacyOutput']['description']['name'],
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            for (var pharmacy in nearbyPharmacies)
-              _buildPharmacyCard(pharmacy),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (isOpenAllHours)
+                  Text(
+                    'Abierto 24/7',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  )
+                else
+                  ElevatedButton(
+                    onPressed: () {
+                      _showModal(pharmacy['pharmacyOutput']['pharmacySchedules']);
+                    },
+                    child: Text('Ver horarios'),
+                  ),
+                TextButton(
+                  onPressed: () {
+                    _navigateToPharmacyLocation(
+                      pharmacy['pharmacyOutput']['location']['latitude'],
+                      pharmacy['pharmacyOutput']['location']['longitude'],
+                    );
+                  },
+                  child: Text('Ver en mapa'),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            _buildDistanceInfo('A pie', Icons.directions_walk, pharmacy),
+            _buildDistanceInfo('En coche', Icons.directions_car, pharmacy),
+            _buildDistanceInfo('En coche con tráfico', Icons.traffic, pharmacy),
+            SizedBox(height: 8),
+            Text(
+              'Stock disponible: ${pharmacy['stock'] ?? 0}',
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPharmacyCard(dynamic pharmacy) {
-    return Card(
-      elevation: 3,
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+  Widget _buildDistanceInfo(String title, IconData icon, dynamic pharmacy) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[700]!),
+      ),
       child: ListTile(
-        contentPadding: EdgeInsets.all(12),
-        title: Text(
-          pharmacy['pharmacyOutput']['description']['name'],
-          style: TextStyle(fontWeight: FontWeight.bold),
+        leading: Icon(
+          icon,
+          color: Colors.black,
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 8),
-            Text(
-              'Distancia a pie: ${pharmacy['distanceInMetersWalking']} metros',
-            ),
-            Text(
-              'Tiempo estimado a pie: ${pharmacy['estimatedTravelTimeWalking']}',
-            ),
-            Text(
-              'Distancia en coche: ${pharmacy['distanceInMetersDriving']} metros',
-            ),
-            Text(
-              'Tiempo estimado en coche: ${pharmacy['estimatedTravelTimeDriving']}',
-            ),
-            Text(
-              'Distancia en coche (tráfico): ${pharmacy['distanceInMetersDrivingTraffic']} metros',
-            ),
-            Text(
-              'Tiempo estimado en coche (tráfico): ${pharmacy['estimatedTravelTimeDrivingTraffic']}',
-            ),
-            Text(
-              'Stock disponible: ${pharmacy['stock']}',
-            ),
-          ],
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        subtitle: Text(
+          'Distancia: ${pharmacy['distanceInMetersWalking'] ?? 0} metros\n'
+              'Tiempo estimado: ${pharmacy['estimatedTravelTimeWalking'] ?? 'No disponible'}',
+          style: TextStyle(color: Colors.black),
         ),
         onTap: () {
-          _navigateToPharmacyLocation(
-              pharmacy['pharmacyOutput']['location']['latitude'],
-              pharmacy['pharmacyOutput']['location']['longitude']);
+          // Implementar acción si es necesario
         },
       ),
     );
@@ -176,6 +231,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           longitude: longitude,
         ),
       ),
+    );
+  }
+
+  void _showModal(List<dynamic> pharmacySchedules) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: ListView.builder(
+            itemCount: pharmacySchedules.length,
+            itemBuilder: (context, index) {
+              return Card(
+                child: ListTile(
+                  title: Text(pharmacySchedules[index]['dayOfWeek']),
+                  subtitle: Text(
+                    '${pharmacySchedules[index]['openingTime']} - ${pharmacySchedules[index]['closingTime']}',
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
