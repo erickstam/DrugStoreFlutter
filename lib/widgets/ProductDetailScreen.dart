@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../Helpers/Enums.dart';
 import '../Manager/ApiManager.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -130,7 +131,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildPharmacyCard(dynamic pharmacy) {
-    bool isOpenAllHours = pharmacy['isOpenAllHours'] ?? false;
+    bool isOpenAllHours = pharmacy['pharmacyOutput']['isOpenAllHours'] ?? false;
 
     return Card(
       elevation: 3,
@@ -148,9 +149,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            _buildDistanceInfo('A pie', Icons.directions_walk, pharmacy),
-            _buildDistanceInfo('En coche', Icons.directions_car, pharmacy),
-            _buildDistanceInfo('En coche con tráfico', Icons.traffic, pharmacy),
+            _buildDistanceInfo('A pie', Icons.directions_walk, pharmacy, TransportType.Walk),
+            _buildDistanceInfo('En coche', Icons.directions_car, pharmacy,TransportType.Drive),
+            _buildDistanceInfo('En coche con tráfico', Icons.traffic, pharmacy,TransportType.DriveWithTraffic),
             SizedBox(height: 8),
             Text(
               'Stock disponible: ${pharmacy['stock'] ?? 0}',
@@ -193,7 +194,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildDistanceInfo(String title, IconData icon, dynamic pharmacy) {
+  Widget _buildDistanceInfo(String title, IconData icon, dynamic pharmacy, TransportType transportType) {
+    String distanceText;
+    String travelTimeText;
+
+    switch (transportType) {
+      case TransportType.Drive:
+        distanceText = 'Distancia: ${pharmacy['distanceInMetersDriving'] ?? 0} metros';
+        travelTimeText = 'Tiempo estimado: ${pharmacy['estimatedTravelTimeDriving'] ?? 'No disponible'}';
+        break;
+      case TransportType.Walk:
+        distanceText = 'Distancia: ${pharmacy['distanceInMetersWalking'] ?? 0} metros';
+        travelTimeText = 'Tiempo estimado: ${pharmacy['estimatedTravelTimeWalking'] ?? 'No disponible'}';
+        break;
+      case TransportType.DriveWithTraffic:
+        distanceText = 'Distancia: ${pharmacy['distanceInMetersDrivingTraffic'] ?? 0} metros';
+        travelTimeText = 'Tiempo estimado: ${pharmacy['estimatedTravelTimeDrivingTraffic'] ?? 'No disponible'}';
+        break;
+    }
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
@@ -213,10 +232,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             color: Colors.black,
           ),
         ),
-        subtitle: Text(
-          'Distancia: ${pharmacy['distanceInMetersWalking'] ?? 0} metros\n'
-              'Tiempo estimado: ${pharmacy['estimatedTravelTimeWalking'] ?? 'No disponible'}',
-          style: TextStyle(color: Colors.black),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              distanceText,
+              style: TextStyle(color: Colors.black),
+            ),
+            Text(
+              travelTimeText,
+              style: TextStyle(color: Colors.black),
+            ),
+          ],
         ),
         onTap: () {
           // Implementar acción si es necesario
