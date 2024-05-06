@@ -200,7 +200,7 @@ class PharmacyHelper {
       // Configurar la solicitud a la API de Mapbox Directions
       String accessToken = '';
       String apiUrl = 'api.mapbox.com';
-      String path = '/directions/v5/mapbox/driving/' +
+      String path = '/directions/v5/mapbox/driving-traffic/' +
           '${currentPosition.longitude},${currentPosition.latitude};' +
           '${pharmacyLongitude},${pharmacyLatitude}';
 
