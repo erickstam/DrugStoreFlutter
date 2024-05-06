@@ -59,7 +59,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalles del Producto'),
+        title: Text(''),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -68,8 +68,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Nombre: ${widget.item['description']['name']}',
+              Text(widget.item['description']['name'],
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               SizedBox(height: 8),
@@ -150,8 +149,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
             SizedBox(height: 8),
             _buildDistanceInfo('A pie', Icons.directions_walk, pharmacy, TransportType.Walk),
-            _buildDistanceInfo('En coche', Icons.directions_car, pharmacy,TransportType.Drive),
-            _buildDistanceInfo('En coche con tráfico', Icons.traffic, pharmacy,TransportType.DriveWithTraffic),
+            _buildDistanceInfo('En coche promedio ', Icons.directions_car, pharmacy,TransportType.Drive),
+            _buildDistanceInfo('En coche con tráfico actual', Icons.traffic, pharmacy,TransportType.DriveWithTraffic),
             SizedBox(height: 8),
             Text(
               'Stock disponible: ${pharmacy['stock'] ?? 0}',
@@ -175,16 +174,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     onPressed: () {
                       _showModal(pharmacy['pharmacyOutput']['pharmacySchedules']);
                     },
-                    child: Text('Ver horarios'),
+                    child: Text('Horarios'),
                   ),
-                TextButton(
+                ElevatedButton(
+                  onPressed: () {
+                    _showRoute(
+                      pharmacy['pharmacyOutput']['location']['latitude'],
+                      pharmacy['pharmacyOutput']['location']['longitude'],
+                    );
+                  },
+                  child: Text('Cómo Llegar'),
+                ),
+                ElevatedButton(
                   onPressed: () {
                     _showMapModal(
                       pharmacy['pharmacyOutput']['location']['latitude'],
                       pharmacy['pharmacyOutput']['location']['longitude'],
                     );
                   },
-                  child: Text('Ver en mapa'),
+                  child: Text('Ubicación'),
                 ),
               ],
             ),
@@ -193,6 +201,62 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
+
+  void _showRoute(double pharmacyLatitude, double pharmacyLongitude) async {
+    Position currentPosition = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  child: GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(currentPosition.latitude, currentPosition.longitude),
+                      zoom: 14,
+                    ),
+                    markers: {
+                      Marker(
+                        markerId: MarkerId('pharmacy'),
+                        position: LatLng(pharmacyLatitude, pharmacyLongitude),
+                      ),
+                    },
+                    polylines: {
+                      Polyline(
+                        polylineId: PolylineId('route'),
+                        color: Colors.blue,
+                        width: 5,
+                        points: [
+                          LatLng(currentPosition.latitude, currentPosition.longitude),
+                          LatLng(pharmacyLatitude, pharmacyLongitude),
+                        ],
+                      ),
+                    },
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cerrar'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
   Widget _buildDistanceInfo(String title, IconData icon, dynamic pharmacy, TransportType transportType) {
     String distanceText;
