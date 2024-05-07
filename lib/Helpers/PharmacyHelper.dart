@@ -73,9 +73,9 @@ class PharmacyHelper {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            _buildDistanceInfo('A pie', Icons.directions_walk, pharmacy, TransportType.Walk),
-            _buildDistanceInfo('En coche promedio', Icons.directions_car, pharmacy, TransportType.Drive),
-            _buildDistanceInfo('En coche con tráfico actual', Icons.traffic, pharmacy, TransportType.DriveWithTraffic),
+            _buildDistanceInfo('A pie', Icons.directions_walk, pharmacy, TransportType.Walk,context),
+            _buildDistanceInfo('En coche promedio', Icons.directions_car, pharmacy, TransportType.Drive,context),
+            _buildDistanceInfo('En coche con tráfico actual', Icons.traffic, pharmacy, TransportType.DriveWithTraffic,context),
             SizedBox(height: 8),
             Text(
               'Stock disponible: ${pharmacy['stock'] ?? 0}',
@@ -103,17 +103,6 @@ class PharmacyHelper {
                   ),
                 ElevatedButton(
                   onPressed: () {
-                    _showRoute(
-                      pharmacy['pharmacyOutput']['description']['name'],
-                      pharmacy['pharmacyOutput']['location']['latitude'],
-                      pharmacy['pharmacyOutput']['location']['longitude'],
-                      context,
-                    );
-                  },
-                  child: Text('Cómo Llegar'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
                     _showMapModal(
                       pharmacy['pharmacyOutput']['description']['name'],
                       pharmacy['pharmacyOutput']['location']['latitude'],
@@ -131,7 +120,7 @@ class PharmacyHelper {
     );
   }
 
-  Widget _buildDistanceInfo(String title, IconData icon, dynamic pharmacy, TransportType transportType) {
+  Widget _buildDistanceInfo(String title, IconData icon, dynamic pharmacy, TransportType transportType, BuildContext context) {
     String distanceText;
     String travelTimeText;
 
@@ -182,6 +171,20 @@ class PharmacyHelper {
             ),
           ],
         ),
+        trailing: ElevatedButton(
+          onPressed: () {
+            _showRoute(
+              title + " a "+ pharmacy['pharmacyOutput']['description']['name'],
+              pharmacy['pharmacyOutput']['location']['latitude'],
+              pharmacy['pharmacyOutput']['location']['longitude'],
+              transportType,
+              context,
+            );
+          },
+          style: ElevatedButton.styleFrom(
+          ),
+          child: Text('Ver Ruta'),
+        ),
         onTap: () {
           // Implementar acción si es necesario
         },
@@ -190,7 +193,7 @@ class PharmacyHelper {
   }
 
 
-  void _showRoute(String pharmacyName, double pharmacyLatitude, double pharmacyLongitude, BuildContext context) async {
+  void _showRoute(String pharmacyName, double pharmacyLatitude, double pharmacyLongitude, TransportType transportType, BuildContext context) async {
     try {
       // Obtener la posición actual del usuario
       Position currentPosition = await Geolocator.getCurrentPosition(
@@ -200,7 +203,25 @@ class PharmacyHelper {
       // Configurar la solicitud a la API de Mapbox Directions
       String accessToken = '';
       String apiUrl = 'api.mapbox.com';
-      String path = '/directions/v5/mapbox/driving-traffic/' +
+      String directionsType;
+
+      // Determinar el tipo de direcciones según el tipo de transporte seleccionado
+      switch (transportType) {
+        case TransportType.Drive:
+          directionsType = 'driving';
+          break;
+        case TransportType.Walk:
+          directionsType = 'walking';
+          break;
+        case TransportType.DriveWithTraffic:
+          directionsType = 'driving-traffic';
+          break;
+        default:
+          directionsType = 'driving'; // Valor predeterminado si el tipo de transporte no está definido correctamente
+          break;
+      }
+
+      String path = '/directions/v5/mapbox/$directionsType/' +
           '${currentPosition.longitude},${currentPosition.latitude};' +
           '${pharmacyLongitude},${pharmacyLatitude}';
 
@@ -257,7 +278,7 @@ class PharmacyHelper {
                           children: [
                             Expanded(
                               child: Text(
-                                'La ruta más rápida a $pharmacyName',
+                                pharmacyName,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 18.0,
@@ -330,6 +351,7 @@ class PharmacyHelper {
       // Manejar cualquier error que pueda ocurrir durante la solicitud de la ruta
     }
   }
+
 
   void _showMapModal(String pharmacyName, double latitude, double longitude, BuildContext context) {
     showModalBottomSheet(
