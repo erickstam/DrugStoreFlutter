@@ -79,8 +79,7 @@ class PharmacyHelper {
             _buildDistanceInfo('En coche promedio', Icons.directions_car, pharmacy, TransportType.Drive,context),
             _buildDistanceInfo('En coche con tráfico actual', Icons.traffic, pharmacy, TransportType.DriveWithTraffic,context),
             SizedBox(height: 8),
-            Text(
-              'Stock disponible: ${pharmacy['stock'] ?? 0}',
+            Text(pharmacy['stock']  != null ? 'Stock disponible: ${pharmacy['stock'] ?? 0}': '' ,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),

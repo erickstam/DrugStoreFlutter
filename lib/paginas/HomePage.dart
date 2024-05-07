@@ -1,5 +1,6 @@
 import 'dart:ffi';
 import '../widgets/ProductsList.dart' as CustomProductsList;
+import '../widgets/PharmacyNearbyList.dart' as pharmacyNearbyList;
 import '../widgets/login.dart' as loguin;
 import 'package:flutter/material.dart';
 
@@ -49,7 +50,11 @@ class DrawerMenu extends StatelessWidget {
           ListTile(
             title: Text('Farmacias Cercanas'),
             onTap: () {
-              // Agrega aquí la navegación o acciones cuando se selecciona 'Farmacias Cercanas'
+              Navigator.pop(context); // Cerrar el drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => pharmacyNearbyList.Pharmacynearbylist()),
+              );
             },
           ),
           ListTile(
