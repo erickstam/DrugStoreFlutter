@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import '../Manager/ApiManager.dart';
 import 'Enums.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PharmacyHelper {
   final ApiManager apiManager;
@@ -267,77 +269,76 @@ class PharmacyHelper {
           builder: (BuildContext context) {
             return Container(
               height: MediaQuery.of(context).size.height * 0.8,
-              child: Stack(
+              child: Column(
                 children: [
-                  Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                pharmacyName,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
+                  Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      pharmacyName,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-                          child: GoogleMap(
-                            initialCameraPosition: CameraPosition(
-                              target: LatLng(currentPosition.latitude, currentPosition.longitude),
-                              zoom: 14,
-                            ),
-                            markers: {
-                              Marker(
-                                markerId: MarkerId('pharmacy'),
-                                position: LatLng(pharmacyLatitude, pharmacyLongitude),
-                              ),
-                            },
-                            polylines: {
-                              Polyline(
-                                polylineId: PolylineId('route'),
-                                color: Colors.blue,
-                                width: 5,
-                                points: polylineCoordinates,
-                              ),
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  Positioned(
-                    top: 16.0,
-                    right: 16.0,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          color: Colors.red[700],
-                          shape: BoxShape.circle,
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+                      child: GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(currentPosition.latitude, currentPosition.longitude),
+                          zoom: 14,
                         ),
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 24,
-                        ),
+                        markers: {
+                          Marker(
+                            markerId: MarkerId('pharmacy'),
+                            position: LatLng(pharmacyLatitude, pharmacyLongitude),
+                          ),
+                        },
+                        polylines: {
+                          Polyline(
+                            polylineId: PolylineId('route'),
+                            color: Colors.blue,
+                            width: 5,
+                            points: polylineCoordinates,
+                          ),
+                        },
                       ),
                     ),
                   ),
+            Padding(
+            padding: const EdgeInsets.all(16.0),
+            child:ElevatedButton(
+              onPressed: () {
+                launchGoogleMaps(
+                  currentPosition.latitude,
+                  currentPosition.longitude,
+                  pharmacyLatitude,
+                  pharmacyLongitude,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey,
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 18),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.map, color: Colors.white), // Icono de Google Maps
+                  SizedBox(width: 8),
+                  Text(
+                    'Abrir en Google Maps',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ),
                 ],
               ),
             );
@@ -352,7 +353,19 @@ class PharmacyHelper {
     }
   }
 
+  static Future<void> launchGoogleMaps(double startLat, double startLng, double destLat, double destLng) async {
+    final url = 'https://www.google.com/maps/dir/?api=1&origin=$startLat,$startLng&destination=$destLat,$destLng';
 
+    try {
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrlString(url);
+      } else {
+        throw 'No se pudo lanzar $url';
+      }
+    } catch (e) {
+      print('Error al lanzar Google Maps: $e');
+    }
+  }
   void _showMapModal(String pharmacyName, double latitude, double longitude, BuildContext context) {
     showModalBottomSheet(
       context: context,
