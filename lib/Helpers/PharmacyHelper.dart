@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../Manager/ApiManager.dart';
+import '../widgets/PharmacyDetailScreen.dart';
 import 'Enums.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -102,6 +103,17 @@ class PharmacyHelper {
                     },
                     child: Text('Horarios'),
                   ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PharmacyDetailScreen(pharmacyData: pharmacy),
+                      ),
+                    );
+                  },
+                  child: Text('Ver detalles'),
+                ),
                 ElevatedButton(
                   onPressed: () {
                     _showMapModal(
