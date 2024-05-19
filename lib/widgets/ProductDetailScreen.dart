@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../Helpers/PharmacyHelper.dart';
@@ -14,12 +15,15 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late Future<dynamic> futureNearbyPharmacies;
+  late Completer<dynamic> _completer;
   final ApiManager apiManager = ApiManager();
   final PharmacyHelper pharmacyHelper = PharmacyHelper(apiManager: ApiManager());
 
   @override
   void initState() {
     super.initState();
+    _completer = Completer<dynamic>();
+    futureNearbyPharmacies = _completer.future; // Inicializa futureNearbyPharmacies
     _getLocationAndFetchData();
   }
 
@@ -27,17 +31,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     try {
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        futureNearbyPharmacies = pharmacyHelper.fetchNearbyPharmacies(
-          'https://pharmacylocation.azurewebsites.net/api/pharmacy/products/${widget.item['id']}',
-          position.latitude,
-          position.longitude,
-        );
-      });
+      final result = await pharmacyHelper.fetchNearbyPharmacies(
+        'https://pharmacylocation.azurewebsites.net/api/pharmacy/products/${widget.item['id']}',
+        position.latitude,
+        position.longitude,
+      );
+      _completer.complete(result);
     } catch (e) {
-      setState(() {
-        futureNearbyPharmacies = Future.error('Failed to get location: $e');
-      });
+      _completer.completeError('Failed to get location: $e');
     }
   }
 
