@@ -150,7 +150,7 @@ class PharmacyDetailScreen extends StatelessWidget {
       return []; // Retorna una lista vacía si no se puede obtener la posición actual
     }
 
-    String accessToken = '';
+    String accessToken = 'pk.eyJ1IjoiaXNhMDA5MSIsImEiOiJjbHZ1aXY5czkxbHE2MnNtZ3lzdGN2cjN1In0.7I9fMmp7hKBe1ygjYAqnWQ';
     String apiUrl = 'api.mapbox.com';
     String directionsType;
 

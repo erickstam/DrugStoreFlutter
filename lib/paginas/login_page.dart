@@ -70,14 +70,15 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 const SizedBox(height: 20),
                 //logo
-                const Icon(
-                  Icons.lock,
-                  size: 55,
+                Image.asset(
+                  'assets/Drugstore.png', // Reemplaza 'ruta_de_tu_imagen' con la ruta de la imagen en tu proyecto
+                  width: 500, // Ancho deseado de la imagen
+                  height: 500, // Alto deseado de la imagen
                 ),
                 const SizedBox(height: 20),
                 //welcome back, you've been missed!
                 const Text(
-                  'Welcome to your Drug Store app',
+                  'Bienvenido',
                   style: TextStyle(
                     color: Color.fromARGB(255, 147, 149, 150),
                     fontSize: 16,
@@ -87,14 +88,14 @@ class _LoginPageState extends State<LoginPage> {
                 //username textfield
                 ImputTextMaterial(
                   controller: usernameController,
-                  hintText: 'Username',
+                  hintText: 'Email',
                   obscureText: false,
                 ),
                 const SizedBox(height: 20),
                 //password textfield
                 ImputTextMaterial(
                   controller: passwordController,
-                  hintText: 'Password',
+                  hintText: 'Contraseña',
                   obscureText: true,
                 ),
                 const SizedBox(height: 10),
@@ -105,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        'Forgot Password?',
+                        '¿ Olvidaste tu contraseña?',
                         style:
                             TextStyle(color: Color.fromARGB(255, 147, 149, 150)),
                       )
@@ -115,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 20),
                 //sign in button
                 ButtonsMaterial(
-                  text: "Sign In",
+                  text: "Loguearse",
                   onTap: signUserIn,
                 ),
                 const SizedBox(height: 20),
@@ -133,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
-                          'Or continue with',
+                          'O continuar con',
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
@@ -160,12 +161,12 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Not a member? ', style: TextStyle(color: Colors.blue)),
+                    const Text('¿No eres parte de DrugStore? ', style: TextStyle(color: Colors.blue)),
                     const SizedBox(height: 4),
                     GestureDetector(
                       onTap: widget.onTap,
                       child: const Text(
-                        'Register now',
+                        'Registrate Ahora',
                         style: TextStyle(
                             color: Colors.blue, fontWeight: FontWeight.bold),
                       ),

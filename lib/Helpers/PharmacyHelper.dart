@@ -214,7 +214,7 @@ class PharmacyHelper {
       );
 
       // Configurar la solicitud a la API de Mapbox Directions
-      String accessToken = '';
+      String accessToken = 'pk.eyJ1IjoiaXNhMDA5MSIsImEiOiJjbHZ1aXY5czkxbHE2MnNtZ3lzdGN2cjN1In0.7I9fMmp7hKBe1ygjYAqnWQ';
       String apiUrl = 'api.mapbox.com';
       String directionsType;
 

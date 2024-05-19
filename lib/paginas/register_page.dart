@@ -101,14 +101,15 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 const SizedBox(height: 20),
                 //logo
-                const Icon(
-                  Icons.lock,
-                  size: 55,
+                Image.asset(
+                  'assets/Drugstore.png', // Reemplaza 'ruta_de_tu_imagen' con la ruta de la imagen en tu proyecto
+                  width: 500, // Ancho deseado de la imagen
+                  height: 500, // Alto deseado de la imagen
                 ),
                 const SizedBox(height: 20),
                 //lets create an account 
                 const Text(
-                  'Welcome to your  new Drug Store Family',
+                  'Registrate en DrugStore',
                   style: TextStyle(
                     color: Color.fromARGB(255, 147, 149, 150),
                     fontSize: 16,
@@ -118,27 +119,27 @@ class _RegisterPageState extends State<RegisterPage> {
                 //username textfield
                 ImputTextMaterial(
                   controller: usernameController,
-                  hintText: 'Username',
+                  hintText: 'Email',
                   obscureText: false,
                 ),
                 const SizedBox(height: 15),
                 //password textfield
                 ImputTextMaterial(
                   controller: passwordController,
-                  hintText: 'Password',
+                  hintText: 'Contraseña',
                   obscureText: true,
                 ),
                 const SizedBox(height: 15),
                 //confirm password textfield
                 ImputTextMaterial(
                   controller: confirmPasswordController,
-                  hintText: 'Confirm Password',
+                  hintText: 'Confirmar contraseña',
                   obscureText: true,
                 ),
                 const SizedBox(height: 20),
                 //sign in button
                 ButtonsMaterial(
-                  text: "Sign Up",
+                  text: "Registrarse",
                   onTap: signUserUp,
                 ),
                 const SizedBox(height: 20),
@@ -156,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
-                          'Or continue with',
+                          'o continua con',
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
@@ -183,12 +184,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have an account? ', style: TextStyle(color: Colors.blue)),
+                    const Text('ya tienes cuenta? ', style: TextStyle(color: Colors.blue)),
                     const SizedBox(height: 4),
                     GestureDetector(
                       onTap: widget.onTap,
                       child: const Text(
-                        'Login now',
+                        'Logueate ahora',
                         style: TextStyle(
                             color: Colors.blue, fontWeight: FontWeight.bold),
                       ),
