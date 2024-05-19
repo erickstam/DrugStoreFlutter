@@ -3,12 +3,23 @@ import '../widgets/ProductsList.dart' as CustomProductsList;
 import '../widgets/PharmacyNearbyList.dart' as pharmacyNearbyList;
 import '../widgets/login.dart' as loguin;
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatelessWidget {
+  HomePage({super.key});
+
+  
+// sign user out method
+void singUserOut(){
+  FirebaseAuth.instance.signOut();
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [IconButton(onPressed: singUserOut, icon: const Icon(Icons.logout))],
+        
         title: Text('DrugStore'),
         backgroundColor: Colors.blue, // Cambiar el color del AppBar a cian
       ),
@@ -19,6 +30,7 @@ class HomePage extends StatelessWidget {
 }
 
 class DrawerMenu extends StatelessWidget {
+  final user = FirebaseAuth.instance.currentUser!;
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -29,15 +41,28 @@ class DrawerMenu extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.blue,
             ),
-            child: Text(
-              'Menú',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Menú',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+                SizedBox(height: 8), // Espacio entre los textos
+                Text(
+                  'Email: ${user.email!}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             ),
-          ),
-          ListTile(
+          ),          ListTile(
             title: Text('Productos'),
             onTap: () {
               Navigator.pop(context); // Cerrar el drawer
